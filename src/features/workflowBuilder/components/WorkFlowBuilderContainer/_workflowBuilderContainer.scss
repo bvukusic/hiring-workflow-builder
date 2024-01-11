@@ -1,0 +1,12 @@
+.hwb-builder-container-layout {
+    height: 100%;
+    width: 100%;
+    border-left: 2px solid $hwb-orange-900;
+
+    .sidebar-menu {
+
+        .ant-layout-sider-children {
+            padding: $hwb-padding-sm;
+        }
+    }
+}

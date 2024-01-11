@@ -1,0 +1,16 @@
+.reactflow-wrapper {
+    height: 100%;
+    width: 100%;
+
+    .workflow-background {
+        background-color: $hwb-blue-800;
+    }
+
+    .react-flow__node {
+        background-color: $hwb-default-node;
+        border: 1px solid $hwb-white;
+        color: $hwb-white;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 15%), 0 2px 4px -1px rgb(0 0 0 / 8%);
+    }
+}

@@ -1,0 +1,60 @@
+.node-menu {
+    padding-top: $hwb-padding-md;
+
+    .description {
+        color: $hwb-white;
+    }
+
+    .node-item {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 50px;
+        width: 100%;
+        border: 2px solid $hwb-white;
+        color: $hwb-white;
+        border-radius: 8px;
+
+        .inputs {
+            position: absolute;
+            left: 4px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-direction: column;
+            height: 50px;
+            width: 10px;
+        }
+
+        .outputs {
+            position: absolute;
+            right: 4px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-direction: column;
+            height: 50px;
+            width: 10px;
+        }
+
+        .node-pin {
+            height: 8px;
+            width: 8px;
+            border-radius: 99px;
+            background-color: $hwb-white;
+            border: 1px solid $hwb-yellow-500;
+        }
+    }
+
+    .default {
+        background-color: $hwb-default-node;
+    }
+
+    .success {
+        background-color: $hwb-ok;
+    }
+
+    .failure {
+        background-color: $hwb-off;
+    }
+}

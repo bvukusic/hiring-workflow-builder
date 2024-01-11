@@ -1,0 +1,18 @@
+.node-wrapper {
+    height: 100%;
+    width: 100%;
+    font-size: 8px;
+    padding: $hwb-padding-sm;
+    background-color: $hwb-default-node;
+    border-radius: 6px;
+}
+
+.success {
+    background-color: $hwb-ok;
+    border-radius: 6px;
+}
+
+.failure {
+    background-color: $hwb-off;
+    border-radius: 6px;
+}
