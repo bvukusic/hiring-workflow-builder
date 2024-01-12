@@ -1,12 +1,14 @@
-import { Layout, Menu, MenuProps } from 'antd';
+import { Button, Layout, Menu, MenuProps, Modal } from 'antd';
 import Sider from 'antd/es/layout/Sider';
 import { Content } from 'antd/es/layout/layout';
 import { useCallback, useState } from 'react';
 import WorkflowBuilder from '@/features/workflowBuilder/components/workflowBuilder/WorkflowBuilder';
-import { Edge, EdgeChange, Node, NodeChange, OnConnect, Position, ReactFlowProvider, addEdge, useEdgesState, useNodesState } from 'reactflow';
+import { Edge, Node, Position, ReactFlowInstance, ReactFlowJsonObject, ReactFlowProvider } from 'reactflow';
 import './_workflowBuilderContainer.scss';
 import NodeMenu from '@/features/workflowNodes/components/nodeMenu/NodeMenu';
-import WorkflowSelectMenu from '../workflowSelectMenu/WorkflowSelectMenu';
+import WorkflowSelectMenu from '@/features/workflowBuilder/components/workflowSelectMenu/WorkflowSelectMenu';
+import NewWorkflowModal from '@/features/workflowBuilder/components/newWorkflowModal/NewWorkflowModal';
+import { starterWorkflowObject } from '@/features/workflowBuilder/utils/types';
 
 const sideMenuOptions = [
     {
@@ -40,21 +42,68 @@ const initialNodes: Node[] = [
             },
         },
     },
+    {
+        id: 'sendEmailTemplateNode-2',
+        type: 'sendEmailTemplateNode',
+        position: { x: 400, y: 80 },
+        data: {
+            selects: {
+                'handle-0': 'rejectionEmail',
+            },
+        },
+    },
+    {
+        id: 'rejectCandidateNode-3',
+        type: 'rejectCandidateNode',
+        position: { x: 600, y: 90 },
+        data: {},
+    },
 ];
 
 const initialEdges: Edge[] = [
     {
-        id: 'onReceiveCandidate-e1-2',
+        id: 'onReceiveCandidate-e1-0',
         source: 'onReceiveCandidate-0',
         target: 'questionnaireNode-1',
     },
+    {
+        id: 'questionnaireNode-e1-1',
+        source: 'questionnaireNode-1',
+        sourceHandle: 'questionnaireNode-1-output-2',
+        target: 'sendEmailTemplateNode-2',
+    },
+    {
+        id: 'sendEmailTemplateNode-2-e1-2',
+        source: 'sendEmailTemplateNode-2',
+        target: 'rejectCandidateNode-3',
+    }
 ];
 
 function WorkflowBuilderContainer(props: WorkflowBuilderContainerProps) {
     const [selectedSidebarTab, setSelectedSidebarTab] = useState('workflows');
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
-    const onSidebarTabClick: MenuProps['onClick'] = (e) => {
+    const handleSidebarTabClick: MenuProps['onClick'] = (e) => {
         setSelectedSidebarTab(e.key);
+    };
+
+    const handleWorkflowMenuItemClick = () => {
+
+    }
+
+    const showModal = () => {
+        setIsModalOpen(true);
+    };
+
+    const handleOk = (title: string) => {
+        console.log(title);
+        console.log(title.replace(/\s+/g, '').toLowerCase());
+        // const newWorkflow = new ReactFlowInstance();
+        setIsModalOpen(false);
+    };
+
+    const handleCancel = () => {
+        setIsModalOpen(false);
     };
 
     const renderSidebarTab = () => {
@@ -74,11 +123,12 @@ function WorkflowBuilderContainer(props: WorkflowBuilderContainerProps) {
                         defaultSelectedKeys={['workflows']}
                         items={sideMenuOptions}
                         mode='horizontal'
-                        onClick={onSidebarTabClick}
+                        onClick={handleSidebarTabClick}
                         selectedKeys={[selectedSidebarTab]}
                         className='sidebar-menu'
                     />
                     {renderSidebarTab()}
+                    <Button type='primary' onClick={() => showModal()}>Add workflow</Button>
                 </Sider>
                 <Layout>
                     <Content>
@@ -86,6 +136,7 @@ function WorkflowBuilderContainer(props: WorkflowBuilderContainerProps) {
                             nodes={initialNodes}
                             edges={initialEdges}
                         />
+                        <NewWorkflowModal onOk={handleOk} onCancel={handleCancel} open={isModalOpen} />
                     </Content>
                 </Layout>
             </Layout>

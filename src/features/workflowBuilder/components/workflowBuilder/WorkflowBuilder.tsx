@@ -1,46 +1,32 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import ReactFlow, {
-    useNodesState, useEdgesState, addEdge, Node, Edge, Position, OnConnect, Background, ReactFlowInstance, BackgroundVariant
+    useNodesState, useEdgesState, addEdge, Node, Edge, OnConnect, Background, ReactFlowInstance, BackgroundVariant, Panel, useReactFlow
 } from 'reactflow';
 import './_workflowBuilder.scss';
-import QuestionnaireNode from '@/features/workflowNodes/components/nodes/questionnaireNode/QuestionnaireNode';
-import AcceptCandidateNode from '@/features/workflowNodes/components/nodes/acceptCandidateNode/AcceptCandidateNode';
 import { generateCustomNode } from '@/features/workflowBuilder/utils/generateCustomNode';
-import RejectCandidateNode from '@/features/workflowNodes/components/nodes/rejectCandidateNode/RejectCandidateNode';
-import AddToPoolNode from '@/features/workflowNodes/components/nodes/addToPoolNode/AddToPoolNode';
-import OnReceiveCandidateNode from '@/features/workflowNodes/components/nodes/onReceiveCandidateNode/OnReceiveCandidateNode';
-
-const defaultEdgeOptions = {
-    type: 'smoothstep',
-    animated: true,
-}
+import { defaultEdgeOptions, nodeTypes } from '@/features/workflowBuilder/utils/utils';
 
 type WorkflowBuilderProps = {
     nodes: Node[];
     edges: Edge[];
 }
 
-const nodeTypes = {
-    questionnaireNode: QuestionnaireNode,
-    acceptCandidateNode: AcceptCandidateNode,
-    rejectCandidateNode: RejectCandidateNode,
-    addToPoolNode: AddToPoolNode,
-    onReceiveCandidateNode: OnReceiveCandidateNode,
-};
-
 const WorkflowBuilder = (props: WorkflowBuilderProps) => {
     const reactFlowWrapper = useRef<HTMLDivElement>(null);
     const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
+    const { setViewport } = useReactFlow();
     const [nodes, setNodes, onNodesChange] = useNodesState(props.nodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(props.edges);
     const [idIncrement, setIdIncrement] = useState(0);
 
     useEffect(() => {
+        console.log(edges)
+    }, [edges])
+
+    useEffect(() => {
         const id: any = nodes.slice(-1)[0].id;
         const idNumber = parseInt(id.slice(id.indexOf('-') + 1));
         setIdIncrement(idNumber + 1);
-        console.log(nodes.slice(-1)[0].id);
-        console.log(idNumber + 1)
     }, [props.nodes, nodes])
 
     const onConnect: OnConnect = useCallback((params) => {
@@ -65,13 +51,33 @@ const WorkflowBuilder = (props: WorkflowBuilderProps) => {
                 x: event.clientX - 350,
                 y: event.clientY,
             });
-            console.log('setting node of type ' + type + 'with id ' + idIncrement);
             let newNode: Node = generateCustomNode(type, position, idIncrement);
-            // setIdIncrement(idIncrement + 1);
             setNodes((nds) => nds.concat(newNode));
         },
         [reactFlowInstance, setNodes, idIncrement]
     );
+
+    const onSave = useCallback(() => {
+        // if (reactFlowInstance) {
+        //     const flow = reactFlowInstance.toObject();
+        //     localStorage.setItem(flowKey, JSON.stringify(flow));
+        // }
+    }, [reactFlowInstance]);
+
+    const onRestore = useCallback(() => {
+        // const restoreFlow = async () => {
+        //     const flow = JSON.parse(localStorage.getItem(flowKey));
+
+        //     if (flow) {
+        //         const { x = 0, y = 0, zoom = 1 } = flow.viewport;
+        //         setNodes(flow.nodes || []);
+        //         setEdges(flow.edges || []);
+        //         setViewport({ x, y, zoom });
+        //     }
+        // };
+
+        // restoreFlow();
+    }, [setNodes, setViewport]);
 
     return (
         <div className="reactflow-wrapper" ref={reactFlowWrapper}>
@@ -94,6 +100,10 @@ const WorkflowBuilder = (props: WorkflowBuilderProps) => {
                     variant={BackgroundVariant.Lines}
                     lineWidth={0.2}
                 />
+                <Panel position="top-right">
+                    <button onClick={onSave}>save</button>
+                    <button onClick={onRestore}>restore</button>
+                </Panel>
             </ReactFlow>
         </div>
     );

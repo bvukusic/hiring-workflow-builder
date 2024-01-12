@@ -1,3 +1,15 @@
 .workflow-select-menu {
     padding-top: $hwb-padding-md;
 }
+
+.empty-list {
+    color: $hwb-white;
+    padding: $hwb-padding-xl $hwb-padding-md $hwb-padding-md $hwb-padding-md;
+    margin: $hwb-padding-md;
+    background-color: #932f19ae;
+    border-radius: 24px;
+
+    .ant-typography {
+        color: $hwb-white;
+    }
+}

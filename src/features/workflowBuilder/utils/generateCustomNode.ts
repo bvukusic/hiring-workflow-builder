@@ -56,6 +56,20 @@ export function generateCustomNode(type: string, position: XYPosition, idIncreme
                 targetPosition: Position.Left,
             };
             break;
+        case NodeTypeEnum.SendMailTemplate:
+            newNode = {
+                id: `${type}-${idIncrement}`,
+                type: 'sendEmailTemplateNode',
+                position,
+                data: {
+                    selects: {
+                        'handle-0': 'rejectionEmail',
+                    },
+                },
+                sourcePosition: Position.Right,
+                targetPosition: Position.Left,
+            };
+            break;
         case NodeTypeEnum.OnReceiveCandidate:
             newNode = {
                 id: `${type}-${idIncrement}`,
