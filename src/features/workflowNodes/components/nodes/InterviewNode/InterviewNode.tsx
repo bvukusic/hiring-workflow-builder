@@ -4,23 +4,24 @@ import NodeWrapper from '../../nodeWrapper/NodeWrapper';
 import NodeSelectInput from '../../nodeSelectInput/NodeSelectInput';
 import SingleConnectionHandle from '../../singleConnectionHandle/SingleConnectionHandle';
 
-interface QuestionnaireNodeData {
+interface InterviewNodeData {
     color: string;
     onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
     selects: any;
 }
 
-interface QuestionnaireNodeProps extends NodeProps {
-    data: QuestionnaireNodeData;
+interface InterviewNodeProps extends NodeProps {
+    data: InterviewNodeData;
 }
 
-const questionnaireOptions = [
+const interviewOptions = [
     { value: 'screening', label: 'Screening' },
-    { value: 'basicDeveloper', label: 'Basic developer' },
-    { value: 'advanceDeveloper', label: 'Advanced developer' },
+    { value: 'hr_interview', label: 'HR interview' },
+    { value: 'tech_interview', label: 'Tech interview' },
+    { value: 'management_interview', label: 'Management interview' },
 ]
 
-const QuestionnaireNode: React.FC<QuestionnaireNodeProps> = memo(({ id, data, isConnectable }) => {
+const InterviewNode: React.FC<InterviewNodeProps> = memo(({ id, data, isConnectable }) => {
 
     return (
         <>
@@ -33,9 +34,9 @@ const QuestionnaireNode: React.FC<QuestionnaireNodeProps> = memo(({ id, data, is
                 connectionLimit={1}
             />
             <NodeWrapper>
-                <p>Send questionnaire:</p>
+                <p>Schedule interview:</p>
                 {Object.keys(data.selects).map((handleId) => (
-                    <NodeSelectInput options={questionnaireOptions} key={handleId} nodeId={id} value={data.selects[handleId]} handleId={handleId} />
+                    <NodeSelectInput options={interviewOptions} key={handleId} nodeId={id} value={data.selects[handleId]} handleId={handleId} />
                 ))}
             </NodeWrapper>
             <SingleConnectionHandle
@@ -61,4 +62,4 @@ const QuestionnaireNode: React.FC<QuestionnaireNodeProps> = memo(({ id, data, is
     );
 });
 
-export default QuestionnaireNode;
+export default InterviewNode;

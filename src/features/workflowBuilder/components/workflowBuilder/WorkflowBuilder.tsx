@@ -2,32 +2,45 @@ import React, { useCallback, useEffect, useRef, useState } from 'react';
 import ReactFlow, {
     useNodesState, useEdgesState, addEdge, Node, Edge, OnConnect, Background, ReactFlowInstance, BackgroundVariant, Panel, useReactFlow
 } from 'reactflow';
-import './_workflowBuilder.scss';
 import { generateCustomNode } from '@/features/workflowBuilder/utils/generateCustomNode';
 import { defaultEdgeOptions, nodeTypes } from '@/features/workflowBuilder/utils/utils';
+import { Button, Typography } from 'antd';
+import ErrorBox from '../errorBox/ErrorBox';
+import { validateWorkflow } from '../../utils/validation';
+import './_workflowBuilder.scss';
+import HelpBox from '../helpBox/HelpBox';
 
 type WorkflowBuilderProps = {
     nodes: Node[];
     edges: Edge[];
+    onSaveWorkflow: (workflowData: any, workflowName: string) => void;
+    onLoadWorkflow: (workflowName: string) => any;
+    workflowName: string;
 }
 
 const WorkflowBuilder = (props: WorkflowBuilderProps) => {
     const reactFlowWrapper = useRef<HTMLDivElement>(null);
     const [reactFlowInstance, setReactFlowInstance] = useState<ReactFlowInstance | null>(null);
-    const { setViewport } = useReactFlow();
     const [nodes, setNodes, onNodesChange] = useNodesState(props.nodes);
     const [edges, setEdges, onEdgesChange] = useEdgesState(props.edges);
     const [idIncrement, setIdIncrement] = useState(0);
+    const [workflowErrors, setWorkflowErrors] = useState<string[]>([]);
 
     useEffect(() => {
-        console.log(edges)
-    }, [edges])
-
-    useEffect(() => {
-        const id: any = nodes.slice(-1)[0].id;
-        const idNumber = parseInt(id.slice(id.indexOf('-') + 1));
+        const id: any = nodes.slice(-1)[0]?.id;
+        const idNumber = id ? parseInt(id.slice(id.indexOf('-') + 1)) : -1;
         setIdIncrement(idNumber + 1);
-    }, [props.nodes, nodes])
+    }, [nodes])
+
+    useEffect(() => {
+        const errors = validateWorkflow(nodes, edges);
+        setWorkflowErrors(errors);
+    }, [nodes, edges])
+
+    useEffect(() => {
+        setNodes(props.nodes)
+        setEdges(props.edges)
+    }, [props.nodes])
 
     const onConnect: OnConnect = useCallback((params) => {
         setEdges((els) => addEdge(params, els));
@@ -57,27 +70,12 @@ const WorkflowBuilder = (props: WorkflowBuilderProps) => {
         [reactFlowInstance, setNodes, idIncrement]
     );
 
-    const onSave = useCallback(() => {
-        // if (reactFlowInstance) {
-        //     const flow = reactFlowInstance.toObject();
-        //     localStorage.setItem(flowKey, JSON.stringify(flow));
-        // }
-    }, [reactFlowInstance]);
-
-    const onRestore = useCallback(() => {
-        // const restoreFlow = async () => {
-        //     const flow = JSON.parse(localStorage.getItem(flowKey));
-
-        //     if (flow) {
-        //         const { x = 0, y = 0, zoom = 1 } = flow.viewport;
-        //         setNodes(flow.nodes || []);
-        //         setEdges(flow.edges || []);
-        //         setViewport({ x, y, zoom });
-        //     }
-        // };
-
-        // restoreFlow();
-    }, [setNodes, setViewport]);
+    const onSave = () => {
+        if (reactFlowInstance) {
+            const flow = reactFlowInstance.toObject();
+            props.onSaveWorkflow(flow, props.workflowName);
+        }
+    };
 
     return (
         <div className="reactflow-wrapper" ref={reactFlowWrapper}>
@@ -100,9 +98,17 @@ const WorkflowBuilder = (props: WorkflowBuilderProps) => {
                     variant={BackgroundVariant.Lines}
                     lineWidth={0.2}
                 />
+                <Panel position="top-left">
+                    <Typography.Text className='workflow-title'>{props.workflowName}</Typography.Text>
+                </Panel>
                 <Panel position="top-right">
-                    <button onClick={onSave}>save</button>
-                    <button onClick={onRestore}>restore</button>
+                    <Button type='primary' className='save-button' onClick={onSave}>Save</Button>
+                </Panel>
+                <Panel position="bottom-right">
+                    <ErrorBox errors={workflowErrors} />
+                </Panel>
+                <Panel position="bottom-left">
+                    <HelpBox />
                 </Panel>
             </ReactFlow>
         </div>

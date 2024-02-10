@@ -1,6 +1,6 @@
 import { Flex } from 'antd';
-import './_nodeMenu.scss';
 import { NodeTypeEnum } from '../../types/types';
+import './_nodeMenu.scss';
 
 type NodeMenuItem = {
     name: string;
@@ -19,13 +19,6 @@ const nodeOptions: NodeMenuItem[] = [
         style: 'success',
     },
     {
-        name: 'Branch',
-        input: 1,
-        output: 2,
-        type: NodeTypeEnum.Branch,
-        style: 'default',
-    },
-    {
         name: 'Send e-mail template',
         input: 1,
         output: 1,
@@ -35,8 +28,15 @@ const nodeOptions: NodeMenuItem[] = [
     {
         name: 'Send questionnaire',
         input: 1,
-        output: 1,
+        output: 2,
         type: NodeTypeEnum.Questionnaire,
+        style: 'default',
+    },
+    {
+        name: 'Schedule interview',
+        input: 1,
+        output: 2,
+        type: NodeTypeEnum.Interview,
         style: 'default',
     },
     {

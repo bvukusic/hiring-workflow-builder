@@ -21,6 +21,8 @@
     }
 
     .ant-layout-sider-children {
-        padding: $hwb-padding-sm;
+        .main-app-menu {
+            padding: $hwb-padding-sm;
+        }
     }
 }

@@ -25,6 +25,7 @@ function AppLayout(props: AppLayoutProps) {
                 <Menu
                     theme="dark"
                     mode="inline"
+                    className='main-app-menu'
                     defaultSelectedKeys={['1']}
                     items={[
                         {

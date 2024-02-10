@@ -1,0 +1,18 @@
+.error-box-wrapper {
+    .ant-card {
+        width: 500px;
+        background-color: transparent;
+
+        .ant-card-head {
+            background-color: #b5202079;
+            color: $hwb-white;
+        }
+
+        .ant-card-body {
+            max-height: 150px;
+            overflow-y: scroll;
+            background-color: #b5202079;
+            color: $hwb-white;
+        }
+    }
+}

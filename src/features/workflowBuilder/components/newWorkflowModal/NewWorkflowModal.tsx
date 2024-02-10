@@ -1,4 +1,5 @@
-import { Flex, Input, Modal, Typography } from 'antd';
+import { transformWorkflowNameToKey } from '@/util';
+import { Flex, Input, Modal, Typography, Button, message } from 'antd';
 import { useState } from 'react';
 
 type NewWorkflowModalProps = {
@@ -9,16 +10,60 @@ type NewWorkflowModalProps = {
 
 function NewWorkflowModal(props: NewWorkflowModalProps) {
     const [title, setTitle] = useState('');
+    const [isValid, setIsValid] = useState(true);
+
+    const validTitleRegex = /^[a-zA-Z0-9 ]*$/;
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const input = e.target.value;
+        if (validTitleRegex.test(input)) {
+            setTitle(input);
+            setIsValid(true);
+        } else {
+            setIsValid(false);
+            message.error('Invalid characters: Only letters, numbers, and spaces are allowed.');
+        }
+    };
 
     const handleCreateWorkflow = () => {
-        props.onOk(title);
-    }
+        if (!isValid || !title.trim()) {
+            message.error('Please enter a valid name for the workflow.');
+            return;
+        }
+        const workflowKey = transformWorkflowNameToKey(title);
+
+        if (localStorage.getItem(workflowKey)) {
+            alert('A workflow with this name already exists. Please choose a different name.');
+            return;
+        }
+
+        props.onOk(title.trim());
+    };
 
     return (
-        <Modal title="New workflow" open={props.open} onOk={handleCreateWorkflow} onCancel={props.onCancel}>
+        <Modal
+            title="New Workflow"
+            open={props.open}
+            onOk={handleCreateWorkflow}
+            onCancel={props.onCancel}
+            footer={[
+                <Button key="back" onClick={props.onCancel}>
+                    Cancel
+                </Button>,
+                <Button key="submit" type="primary" disabled={!isValid || !title.trim()} onClick={handleCreateWorkflow}>
+                    Create
+                </Button>,
+            ]}
+        >
             <Flex align='left' justify='center' vertical>
                 <Typography.Title level={4}>Name your workflow:</Typography.Title>
-                <Input size="large" placeholder="large size" value={title} onChange={(e) => setTitle(e.target.value)} />
+                <Input
+                    size="large"
+                    placeholder="Workflow name"
+                    value={title}
+                    onChange={handleInputChange}
+                    status={!isValid ? 'error' : ''}
+                />
             </Flex>
         </Modal>
     );

@@ -19,6 +19,20 @@ export function generateCustomNode(type: string, position: XYPosition, idIncreme
                 targetPosition: Position.Left,
             };
             break;
+        case NodeTypeEnum.Interview:
+            newNode = {
+                id: `${type}-${idIncrement}`,
+                type: 'interviewNode',
+                position,
+                data: {
+                    selects: {
+                        'handle-0': 'screening',
+                    },
+                },
+                sourcePosition: Position.Right,
+                targetPosition: Position.Left,
+            };
+            break;
         case NodeTypeEnum.AcceptCandidate:
             newNode = {
                 id: `${type}-${idIncrement}`,

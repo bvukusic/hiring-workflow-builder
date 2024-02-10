@@ -1,14 +1,15 @@
-import { Button, Layout, Menu, MenuProps, Modal } from 'antd';
+import { Layout, Menu, MenuProps, Typography, message } from 'antd';
 import Sider from 'antd/es/layout/Sider';
 import { Content } from 'antd/es/layout/layout';
-import { useCallback, useState } from 'react';
+import { useEffect, useState } from 'react';
 import WorkflowBuilder from '@/features/workflowBuilder/components/workflowBuilder/WorkflowBuilder';
-import { Edge, Node, Position, ReactFlowInstance, ReactFlowJsonObject, ReactFlowProvider } from 'reactflow';
-import './_workflowBuilderContainer.scss';
+import { ReactFlowProvider } from 'reactflow';
 import NodeMenu from '@/features/workflowNodes/components/nodeMenu/NodeMenu';
 import WorkflowSelectMenu from '@/features/workflowBuilder/components/workflowSelectMenu/WorkflowSelectMenu';
 import NewWorkflowModal from '@/features/workflowBuilder/components/newWorkflowModal/NewWorkflowModal';
-import { starterWorkflowObject } from '@/features/workflowBuilder/utils/types';
+import { exampleWorkflowObject, starterWorkflowObject } from '@/features/workflowBuilder/utils/types';
+import { transformKeyToWorkflowName, transformWorkflowNameToKey } from '@/util';
+import './_workflowBuilderContainer.scss';
 
 const sideMenuOptions = [
     {
@@ -24,81 +25,23 @@ const sideMenuOptions = [
 type WorkflowBuilderContainerProps = {
 }
 
-const initialNodes: Node[] = [
-    {
-        id: 'onReceiveCandidate-0',
-        sourcePosition: Position.Right,
-        type: 'onReceiveCandidateNode',
-        data: {},
-        position: { x: 0, y: 0 },
-    },
-    {
-        id: 'questionnaireNode-1',
-        type: 'questionnaireNode',
-        position: { x: 200, y: 0 },
-        data: {
-            selects: {
-                'handle-0': 'screening',
-            },
-        },
-    },
-    {
-        id: 'sendEmailTemplateNode-2',
-        type: 'sendEmailTemplateNode',
-        position: { x: 400, y: 80 },
-        data: {
-            selects: {
-                'handle-0': 'rejectionEmail',
-            },
-        },
-    },
-    {
-        id: 'rejectCandidateNode-3',
-        type: 'rejectCandidateNode',
-        position: { x: 600, y: 90 },
-        data: {},
-    },
-];
-
-const initialEdges: Edge[] = [
-    {
-        id: 'onReceiveCandidate-e1-0',
-        source: 'onReceiveCandidate-0',
-        target: 'questionnaireNode-1',
-    },
-    {
-        id: 'questionnaireNode-e1-1',
-        source: 'questionnaireNode-1',
-        sourceHandle: 'questionnaireNode-1-output-2',
-        target: 'sendEmailTemplateNode-2',
-    },
-    {
-        id: 'sendEmailTemplateNode-2-e1-2',
-        source: 'sendEmailTemplateNode-2',
-        target: 'rejectCandidateNode-3',
-    }
-];
-
 function WorkflowBuilderContainer(props: WorkflowBuilderContainerProps) {
     const [selectedSidebarTab, setSelectedSidebarTab] = useState('workflows');
+    const [currentWorkflow, setCurrentWorkflow] = useState<any>(null);
+    const [currentWorkflowName, setCurrentWorkflowName] = useState('Workflow 2');
+    const [savedWorkflows, setSavedWorkflows] = useState<string[]>([]);
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const handleSidebarTabClick: MenuProps['onClick'] = (e) => {
         setSelectedSidebarTab(e.key);
     };
 
-    const handleWorkflowMenuItemClick = () => {
-
-    }
-
     const showModal = () => {
         setIsModalOpen(true);
     };
 
     const handleOk = (title: string) => {
-        console.log(title);
-        console.log(title.replace(/\s+/g, '').toLowerCase());
-        // const newWorkflow = new ReactFlowInstance();
+        handleCreateNewWorkflow(title);
         setIsModalOpen(false);
     };
 
@@ -106,18 +49,82 @@ function WorkflowBuilderContainer(props: WorkflowBuilderContainerProps) {
         setIsModalOpen(false);
     };
 
+    useEffect(() => {
+        getSavedWorkflows();
+        //generate example workflow if none are saved
+        if (savedWorkflows.length === 0) {
+            saveWorkflow(exampleWorkflowObject, 'Example Workflow');
+            setCurrentWorkflowName('Example Workflow');
+            setCurrentWorkflow(exampleWorkflowObject);
+        }
+    }, [])
+
     const renderSidebarTab = () => {
         if (selectedSidebarTab === 'workflows') {
-            return <WorkflowSelectMenu workflows={[]} />
+            return <WorkflowSelectMenu
+                workflows={savedWorkflows}
+                onClickNewWorkflow={() => showModal()}
+                onSelectWorkflow={handleSelectWorkflow}
+                currentWorkflowName={currentWorkflowName}
+                onDelete={deleteWorkflow}
+            />
         } else if (selectedSidebarTab === 'nodes') {
             return <NodeMenu />
         } else return <div />
     }
 
+    const saveWorkflow = (workflowData: any, workflowName: string) => {
+        const workflowKey = transformWorkflowNameToKey(workflowName);
+        localStorage.setItem(workflowKey, JSON.stringify(workflowData));
+        message.success(`Saved workflow: ${workflowName}!`);
+        getSavedWorkflows();
+    };
+
+
+    const loadWorkflow = (workflowName: string) => {
+        const workflowKey = transformWorkflowNameToKey(workflowName);
+        const workflowData = localStorage.getItem(workflowKey);
+        return workflowData ? JSON.parse(workflowData) : null;
+    };
+
+    const deleteWorkflow = (workflowName: string) => {
+        const key = transformWorkflowNameToKey(workflowName);
+        localStorage.removeItem(key);
+        getSavedWorkflows();
+        setCurrentWorkflow(null);
+    };
+
+    const handleSelectWorkflow = (workflowName: string) => {
+        const loadedWorkflow = loadWorkflow(workflowName);
+        if (loadedWorkflow) {
+            setCurrentWorkflow(loadedWorkflow);
+            setCurrentWorkflowName(workflowName);
+        }
+    };
+
+    const handleCreateNewWorkflow = (workflowName: string) => {
+        const initialWorkflowData = starterWorkflowObject;
+        saveWorkflow(initialWorkflowData, workflowName);
+        setCurrentWorkflow(initialWorkflowData);
+        setCurrentWorkflowName(workflowName);
+    };
+
+    const getSavedWorkflows = () => {
+        const workflows = [];
+        for (let i = 0; i < localStorage.length; i++) {
+            const key = localStorage.key(i);
+            if (key && key.startsWith('workflow_')) {
+                const name = transformKeyToWorkflowName(key);
+                workflows.push(name);
+            }
+        }
+        setSavedWorkflows(workflows);
+    }
+
     return (
         <ReactFlowProvider>
             <Layout className='hwb-builder-container-layout'>
-                <Sider theme='dark' >
+                <Sider theme='dark' width={250}>
                     <Menu
                         theme="dark"
                         defaultSelectedKeys={['workflows']}
@@ -125,17 +132,23 @@ function WorkflowBuilderContainer(props: WorkflowBuilderContainerProps) {
                         mode='horizontal'
                         onClick={handleSidebarTabClick}
                         selectedKeys={[selectedSidebarTab]}
-                        className='sidebar-menu'
                     />
                     {renderSidebarTab()}
-                    <Button type='primary' onClick={() => showModal()}>Add workflow</Button>
                 </Sider>
                 <Layout>
                     <Content>
-                        <WorkflowBuilder
-                            nodes={initialNodes}
-                            edges={initialEdges}
-                        />
+                        {currentWorkflow ?
+                            <WorkflowBuilder
+                                nodes={currentWorkflow.nodes}
+                                edges={currentWorkflow.edges}
+                                workflowName={currentWorkflowName}
+                                onLoadWorkflow={loadWorkflow}
+                                onSaveWorkflow={saveWorkflow}
+                            /> :
+                            <div className='no-workflow-selected'>
+                                <Typography.Text>Select a workflow to get started</Typography.Text>
+                            </div>
+                        }
                         <NewWorkflowModal onOk={handleOk} onCancel={handleCancel} open={isModalOpen} />
                     </Content>
                 </Layout>

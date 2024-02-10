@@ -3,10 +3,29 @@
     width: 100%;
     border-left: 2px solid $hwb-blue-500;
 
-    .sidebar-menu {
+    .ant-menu-dark.ant-menu-horizontal {
+        width: 100%;
+        display: flex;
+        justify-content: space-around;
 
-        .ant-layout-sider-children {
-            padding: $hwb-padding-sm;
+        .ant-menu-item {
+            display: flex;
+            flex: 1;
+            justify-content: center;
         }
+    }
+
+}
+
+.no-workflow-selected {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: $hwb-blue-800;
+    height: 100vh;
+
+    .ant-typography {
+        font-size: 20px;
+        color: $hwb-white;
     }
 }

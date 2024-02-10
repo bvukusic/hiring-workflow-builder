@@ -1,3 +1,4 @@
+import InterviewNode from '@/features/workflowNodes/components/nodes/InterviewNode/InterviewNode';
 import AcceptCandidateNode from '@/features/workflowNodes/components/nodes/acceptCandidateNode/AcceptCandidateNode';
 import AddToPoolNode from '@/features/workflowNodes/components/nodes/addToPoolNode/AddToPoolNode';
 import OnReceiveCandidateNode from '@/features/workflowNodes/components/nodes/onReceiveCandidateNode/OnReceiveCandidateNode';
@@ -12,6 +13,7 @@ export const defaultEdgeOptions = {
 
 export const nodeTypes = {
     questionnaireNode: QuestionnaireNode,
+    interviewNode: InterviewNode,
     acceptCandidateNode: AcceptCandidateNode,
     rejectCandidateNode: RejectCandidateNode,
     addToPoolNode: AddToPoolNode,
