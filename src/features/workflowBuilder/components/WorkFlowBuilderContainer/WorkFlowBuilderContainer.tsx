@@ -22,10 +22,7 @@ const sideMenuOptions = [
     }
 ]
 
-type WorkflowBuilderContainerProps = {
-}
-
-function WorkflowBuilderContainer(props: WorkflowBuilderContainerProps) {
+function WorkflowBuilderContainer() {
     const [selectedSidebarTab, setSelectedSidebarTab] = useState('workflows');
     const [currentWorkflow, setCurrentWorkflow] = useState<any>(null);
     const [currentWorkflowName, setCurrentWorkflowName] = useState('Workflow 2');

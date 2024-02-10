@@ -1,7 +1,8 @@
-
 # Hiring Workflow Builder
 
 This project is a web application built using Vite, React, TypeScript, React Flow and Ant Design. It's set up with SCSS for styling.
+
+![Screenshot of Application](./images/screenshot.png)
 
 ## Prerequisites
 
